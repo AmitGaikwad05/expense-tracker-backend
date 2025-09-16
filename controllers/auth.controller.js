@@ -50,9 +50,10 @@ res.status(200).json({user: user, success: true, message: "Logged in successfull
 exports.verify = async (req, res)=>{
 
 const token = req.cookies.UserToken;
+console.log(token);
 
 if(!token){
-    return res.status(401).json({message: "Authentication failed"});
+    return res.status(401).json({message: "Authentication failed - Amit"});
 }
 
 const {userId}  = jwt.verify(token, process.env.JWT_SECRET_KEY);
