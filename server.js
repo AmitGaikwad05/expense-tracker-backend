@@ -10,17 +10,19 @@ const earningRoutes = require("./routes/earnings.routes");
 const userRoutes = require("./routes/user.routes");
 dotenv.config();
 
+const corsOptions = {
+  origin: "https://share-and-fun-web-app.vercel.app",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // enable set cookie with credentials (in case of sessions)
+  optionsSuccessStatus: 204,
+};
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(cookieParser());
 app.use(express.static("public"));
 app.use(express.json());
-app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
-    credentials: true,
-    methods: ["GET", "POST", "OPTIONS", "DELETE", "PUT"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(cors(corsOptions));
 
 app.use("/dashboard", dashboardRoutes)
 app.use("/auth" , authRoutes)
