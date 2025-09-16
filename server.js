@@ -11,7 +11,7 @@ const userRoutes = require("./routes/user.routes");
 dotenv.config();
 
 const corsOptions = {
-  origin: "https://share-and-fun-web-app.vercel.app",
+  origin: "https://expense-tracker-frontend-xi-six.vercel.app",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // enable set cookie with credentials (in case of sessions)
   optionsSuccessStatus: 204,
