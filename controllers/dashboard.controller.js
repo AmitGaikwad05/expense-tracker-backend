@@ -39,61 +39,73 @@ exports.fetchDashboardStats = async (req, res) => {
       }
     }
 
-  const token = req.cookies.UserToken;
-                if (!token) return res.status(401).json({ message: "Unauthorized" });
-                const { userId } = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const token = req.cookies.UserToken;
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
+    const { userId } = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
     // ================== EXPENSES ==================
-    const expenses = await ExpenseModel.find({ createdAt: { $gte: fromDate, $lte: toDate }, creatorId: userId }).sort({ createdAt: 1 });
+    const expenses = await ExpenseModel.find({
+      createdAt: { $gte: fromDate, $lte: toDate },
+      creatorId: userId
+    }).sort({ createdAt: 1 });
+
     const totalExpenseAmt = expenses.reduce((sum, exp) => sum + exp.amount, 0);
     const noOfExpenses = expenses.length;
 
     // ================== EARNINGS ==================
     const earnings = await EarningModel.find({
-      createdAt: { $gte: fromDate, $lte: toDate }, creatorId: userId }).sort({ createdAt: 1 });
+      createdAt: { $gte: fromDate, $lte: toDate },
+      creatorId: userId
+    }).sort({ createdAt: 1 });
+
     const totalEarningAmt = earnings.reduce((sum, earn) => sum + earn.amount, 0);
     const noOfEarnings = earnings.length;
 
     // ================== MONTHLY DATASET ARRAY ==================
     const monthMap = {};
-    const allRecords = [...expenses.map(e => ({
-      type: 'expense',
-      amount: e.amount,
-      date: e.createdAt
-    })), ...earnings.map(e => ({
-      type: 'earning',
-      amount: e.amount,
-      date: e.createdAt
-    }))];
+    const allRecords = [
+      ...expenses.map((e) => ({
+        type: "expense",
+        amount: e.amount,
+        date: e.createdAt
+      })),
+      ...earnings.map((e) => ({
+        type: "earning",
+        amount: e.amount,
+        date: e.createdAt
+      }))
+    ];
 
-    allRecords.forEach(rec => {
+    allRecords.forEach((rec) => {
       const d = new Date(rec.date);
-      const monthName = d.toLocaleString('default', { month: 'short' });
+      const monthName = d.toLocaleString("default", { month: "short" });
       if (!monthMap[monthName]) {
         monthMap[monthName] = { label: monthName, expenseAmt: 0, earningAmt: 0 };
       }
-      if (rec.type === 'expense') monthMap[monthName].expenseAmt += rec.amount;
-      if (rec.type === 'earning') monthMap[monthName].earningAmt += rec.amount;
+      if (rec.type === "expense") monthMap[monthName].expenseAmt += rec.amount;
+      if (rec.type === "earning") monthMap[monthName].earningAmt += rec.amount;
     });
 
     const dataset = Object.values(monthMap);
 
     // =============== CALCULATE MONTHS & DAYS DIFFERENCE ===============
+    let start = new Date(fromDate);
+    let end = new Date(toDate);
+
     let months =
-      (toDate.getFullYear() - fromDate.getFullYear()) * 12 +
-      (toDate.getMonth() - fromDate.getMonth());
+      (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth());
 
-    let days = toDate.getDate() - fromDate.getDate();
+    let days = end.getDate() - start.getDate();
 
+    // Adjust if days are negative
     if (days < 0) {
       months -= 1;
-      const prevMonth = new Date(
-        toDate.getFullYear(),
-        toDate.getMonth(),
-        0
-      );
-      days += prevMonth.getDate();
+      const prevMonth = new Date(end.getFullYear(), end.getMonth(), 0); // last day of prev month
+      days = prevMonth.getDate() + days;
     }
+
+    const duration = { months, days };
 
     return res.status(200).json({
       success: true,
@@ -101,20 +113,17 @@ exports.fetchDashboardStats = async (req, res) => {
         !from && !to
           ? "Filtered expenses and earnings for this month"
           : "Filtered expenses and earnings between given dates",
-      duration: { months, days },
+      duration,
       totalExpenseAmt,
       totalEarningAmt,
       noOfExpenses,
       noOfEarnings,
       expenses,
       earnings,
-      dataset 
+      dataset
     });
-
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
-    res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
