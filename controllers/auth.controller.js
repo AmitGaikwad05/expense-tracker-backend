@@ -50,7 +50,7 @@ res.status(200).json({user: user, success: true, message: "Logged in successfull
 exports.verify = async (req, res)=>{
 
 const token = req.cookies.UserToken;
-console.log(token);
+console.log(req.cookies);
 
 if(!token){
     return res.status(401).json({message: "Authentication failed - Amit"});
