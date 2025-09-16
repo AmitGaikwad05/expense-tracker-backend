@@ -13,7 +13,7 @@ dotenv.config();
 const corsOptions = {
   origin: "https://expense-tracker-frontend-xi-six.vercel.app",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true, // enable set cookie with credentials (in case of sessions)
+  credentials: true,
   optionsSuccessStatus: 204,
 };
 

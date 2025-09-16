@@ -40,7 +40,7 @@ const token = jwt.sign(
   process.env.JWT_SECRET_KEY
 );
 
-res.cookie('UserToken', token, { httpOnly: true });
+res.cookie('UserToken', token, { httpOnly: true, sameSite: "none", path: "/"  },);
 
 res.status(200).json({user: user, success: true, message: "Logged in successfully"});
 
