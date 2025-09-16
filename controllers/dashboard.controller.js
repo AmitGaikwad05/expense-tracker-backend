@@ -50,8 +50,7 @@ exports.fetchDashboardStats = async (req, res) => {
 
     // ================== EARNINGS ==================
     const earnings = await EarningModel.find({
-      createdAt: { $gte: fromDate, $lte: toDate },
-    }).sort({ createdAt: 1 });
+      createdAt: { $gte: fromDate, $lte: toDate }, creatorId: userId }).sort({ createdAt: 1 });
     const totalEarningAmt = earnings.reduce((sum, earn) => sum + earn.amount, 0);
     const noOfEarnings = earnings.length;
 
