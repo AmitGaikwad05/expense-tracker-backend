@@ -40,7 +40,7 @@ const token = jwt.sign(
   process.env.JWT_SECRET_KEY
 );
 
-res.cookie('UserToken', token, { httpOnly: true, secure: true, sameSite: "none", path: "/"  },);
+res.cookie('UserToken', token, { httpOnly: true, secure: true, sameSite: "none", path: "/"  });
 
 res.status(200).json({user: user, success: true, message: "Logged in successfully"});
 
@@ -67,7 +67,7 @@ res.status(200).json({user, success:true, message: "Authenticated user"});
 }
 
 exports.logout = (req, res)=>{
-  res.clearCookie('UserToken');
+  res.clearCookie('UserToken', { httpOnly: true, secure: true, sameSite: "none", path: "/"  });
   res.status(200).json({message: "User Logged out successfully"});
 }
 
