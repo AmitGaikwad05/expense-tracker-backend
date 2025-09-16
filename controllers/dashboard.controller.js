@@ -1,5 +1,8 @@
 const ExpenseModel = require("../models/expense.model");
 const EarningModel = require("../models/earning.model");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 
 exports.dashboard = (req, res) => {
@@ -36,12 +39,12 @@ exports.fetchDashboardStats = async (req, res) => {
       }
     }
 
-
+  const token = req.cookies.UserToken;
+                if (!token) return res.status(401).json({ message: "Unauthorized" });
+                const { userId } = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
     // ================== EXPENSES ==================
-    const expenses = await ExpenseModel.find({
-      createdAt: { $gte: fromDate, $lte: toDate },
-    }).sort({ createdAt: 1 });
+    const expenses = await ExpenseModel.find({ createdAt: { $gte: fromDate, $lte: toDate }, creatorId: userId }).sort({ createdAt: 1 });
     const totalExpenseAmt = expenses.reduce((sum, exp) => sum + exp.amount, 0);
     const noOfExpenses = expenses.length;
 
