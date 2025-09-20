@@ -66,6 +66,9 @@ res.status(200).json({user, success:true, message: "Authenticated user"});
 
 }
 
+
+// =================== Logout logic ======================
+
 exports.logout = (req, res)=>{
   res.clearCookie('UserToken', { httpOnly: true, secure: true, sameSite: "none", path: "/"  });
   res.status(200).json({message: "User Logged out successfully"});

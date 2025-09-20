@@ -15,16 +15,6 @@ exports.fetchDashboardStats = async (req, res) => {
 
     let fromDate, toDate;
 
-    if (!from && !to) {
-      // ================== DEFAULT: THIS MONTH ==================
-      console.log("Fetching data for this month...");
-
-      const today = new Date();
-      toDate = today;
-
-      fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    } else {
-      // ================== CUSTOM DATES ==================
       fromDate = new Date(from);
       toDate = new Date(to);
 
@@ -37,7 +27,7 @@ exports.fetchDashboardStats = async (req, res) => {
           .status(400)
           .json({ message: "From date cannot be after To date" });
       }
-    }
+  
 
     const token = req.cookies.UserToken;
     if (!token) return res.status(401).json({ message: "Unauthorized" });
